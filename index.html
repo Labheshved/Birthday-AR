@@ -3,11 +3,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
+    <style>
+      /* Style for the Start Button */
+      #startButton {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        padding: 15px 30px;
+        background-color: #d4af37; /* Gold color to match the theme */
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-family: 'Georgia', serif;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+    </style>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.001; filterBeta: 100;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <button id="startButton">Tap to See Your Surprise ❤️</button>
+
+    <a-scene 
+      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #scanning-overlay;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
       <a-assets>
-        <video id="birthdayVideo" src="./birthday-memory-reel.mp4" preload="auto" loop="true"></video>
+        <video id="birthdayVideo" src="./birthday-memory-reel.mp4" preload="auto" loop="true" crossOrigin="anonymous"></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -16,5 +43,16 @@
         <a-video src="#birthdayVideo" width="1" height="1.77" position="0 0 0"></a-video>
       </a-entity>
     </a-scene>
+
+    <script>
+      const startButton = document.querySelector('#startButton');
+      const video = document.querySelector('#birthdayVideo');
+
+      // This script hides the button and starts the video/AR when she taps
+      startButton.addEventListener('click', () => {
+        video.play();
+        startButton.style.display = 'none';
+      });
+    </script>
   </body>
 </html>
