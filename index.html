@@ -2,32 +2,25 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
     <style>
       body { margin: 0; overflow: hidden; background: #000; }
-      /* The ultimate fix to hide the VR button */
-      .a-enter-vr, .a-enter-ar, .a-loader-title { display: none !important; }
-      
+      .a-enter-vr, .a-enter-ar { display: none !important; }
       #startButton {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        z-index: 10000; padding: 20px 40px; background: #d4af37; color: white;
-        border: none; border-radius: 50px; font-family: 'Georgia', serif; 
-        font-weight: bold; font-size: 1.2rem; cursor: pointer;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        z-index: 99999; padding: 20px 40px; background: #d4af37; color: white;
+        border: none; border-radius: 50px; font-family: serif; font-weight: bold; font-size: 1.2rem;
       }
     </style>
   </head>
   <body>
-    <button id="startButton">Tap to Start Birthday Surprise ❤️</button>
+    <button id="startButton">Tap for April 14th Surprise ❤️</button>
 
     <a-scene 
       mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
       vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: true"
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights">
+      device-orientation-permission-ui="enabled: true">
       
       <a-assets>
         <video id="birthdayVideo" src="./birthday-memory-reel.mp4" 
@@ -44,24 +37,27 @@
 
     <script>
       const startButton = document.querySelector('#startButton');
-      const sceneEl = document.querySelector('a-scene');
       const video = document.querySelector('#birthdayVideo');
+      const sceneEl = document.querySelector('a-scene');
 
       startButton.addEventListener('click', () => {
-        // 1. Start the AR System manually on click
         const arSystem = sceneEl.systems["mindar-image-system"];
-        arSystem.start(); 
-
-        // 2. Play the video
-        video.play();
-
-        // 3. Remove the button
-        startButton.style.display = 'none';
+        
+        // Step 1: Attempt to start AR
+        try {
+          arSystem.start(); 
+          // Step 2: Attempt to play video
+          video.play();
+          // Step 3: Hide button
+          startButton.style.display = 'none';
+        } catch (err) {
+          alert("Error starting AR: " + err.message);
+        }
       });
 
-      // Error catching
+      // Catch specific MindAR loading errors
       sceneEl.addEventListener("arError", (event) => {
-        console.log("AR Error", event);
+        alert("AR System Error: Check if 'targets.mind' exists and you are on HTTPS.");
       });
     </script>
   </body>
