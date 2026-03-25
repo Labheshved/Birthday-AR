@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -6,20 +7,29 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
     <style>
       body { margin: 0; overflow: hidden; }
+      
+      /* THIS HIDES THE VR BUTTON FORCED BY A-FRAME */
+      .a-enter-vr, .a-enter-ar {
+        display: none !important;
+      }
+
       #startButton {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        z-index: 1000; padding: 15px 30px; background: #d4af37; color: white;
-        border: none; border-radius: 25px; font-family: sans-serif; font-weight: bold;
+        z-index: 10000; padding: 20px 40px; background: #d4af37; color: white;
+        border: none; border-radius: 50px; font-family: 'Georgia', serif; 
+        font-weight: bold; font-size: 1.2rem; cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       }
     </style>
   </head>
   <body>
-    <button id="startButton">Click to Start Birthday Surprise ❤️</button>
+    <button id="startButton">Tap for April 14th Surprise ❤️</button>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: no;" 
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no;" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false"
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights">
       
@@ -30,7 +40,7 @@
                crossOrigin="anonymous"></video>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         <a-video src="#birthdayVideo" width="1" height="1.77" position="0 0 0"></a-video>
@@ -43,11 +53,18 @@
       const sceneEl = document.querySelector('a-scene');
 
       startButton.addEventListener('click', () => {
-        // Start the video and the AR engine
+        // Start AR and Video together
+        const arSystem = sceneEl.systems["mindar-image-system"];
+        arSystem.start(); 
         video.play();
-        // This ensures the camera starts on mobile
-        sceneEl.systems["mindar-image-system"].start(); 
+        
         startButton.style.display = 'none';
+      });
+
+      // Extra check to kill the VR button if it tries to spawn late
+      sceneEl.addEventListener('renderstart', () => {
+        const vrBtn = document.querySelector('.a-enter-vr');
+        if(vrBtn) vrBtn.style.display = 'none';
       });
     </script>
   </body>
