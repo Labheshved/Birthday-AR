@@ -1,40 +1,33 @@
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
     <style>
-      /* Style for the Start Button */
+      body { margin: 0; overflow: hidden; }
       #startButton {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 9999;
-        padding: 15px 30px;
-        background-color: #d4af37; /* Gold color to match the theme */
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-family: 'Georgia', serif;
-        font-size: 18px;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        z-index: 1000; padding: 15px 30px; background: #d4af37; color: white;
+        border: none; border-radius: 25px; font-family: sans-serif; font-weight: bold;
       }
     </style>
   </head>
   <body>
-    <button id="startButton">Tap to See Your Surprise ❤️</button>
+    <button id="startButton">Click to Start Birthday Surprise ❤️</button>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #scanning-overlay;" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
+      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: no;" 
       vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
+      device-orientation-permission-ui="enabled: false"
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights">
       
       <a-assets>
-        <video id="birthdayVideo" src="./birthday-memory-reel.mp4" preload="auto" loop="true" crossOrigin="anonymous"></video>
+        <video id="birthdayVideo" src="./birthday-memory-reel.mp4" 
+               preload="auto" loop="true" 
+               playsinline webkit-playsinline 
+               crossOrigin="anonymous"></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -47,10 +40,13 @@
     <script>
       const startButton = document.querySelector('#startButton');
       const video = document.querySelector('#birthdayVideo');
+      const sceneEl = document.querySelector('a-scene');
 
-      // This script hides the button and starts the video/AR when she taps
       startButton.addEventListener('click', () => {
+        // Start the video and the AR engine
         video.play();
+        // This ensures the camera starts on mobile
+        sceneEl.systems["mindar-image-system"].start(); 
         startButton.style.display = 'none';
       });
     </script>
