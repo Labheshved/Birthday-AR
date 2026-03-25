@@ -6,19 +6,19 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
+      body { margin: 0; overflow: hidden; background-color: black; }
       
-      /* THIS HIDES THE VR BUTTON FORCED BY A-FRAME */
-      .a-enter-vr, .a-enter-ar {
+      /* Force hide all VR/AR buttons */
+      .a-enter-vr, .a-enter-ar, .a-loader-title {
         display: none !important;
       }
 
       #startButton {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        z-index: 10000; padding: 20px 40px; background: #d4af37; color: white;
-        border: none; border-radius: 50px; font-family: 'Georgia', serif; 
+        z-index: 99999; padding: 20px 40px; background: #d4af37; color: white;
+        border: none; border-radius: 50px; font-family: serif; 
         font-weight: bold; font-size: 1.2rem; cursor: pointer;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
       }
     </style>
   </head>
@@ -26,7 +26,7 @@
     <button id="startButton">Tap for April 14th Surprise ❤️</button>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: no;" 
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: no;" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false"
       loading-screen="enabled: false"
@@ -40,7 +40,7 @@
                crossOrigin="anonymous"></video>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         <a-video src="#birthdayVideo" width="1" height="1.77" position="0 0 0"></a-video>
@@ -50,21 +50,19 @@
     <script>
       const startButton = document.querySelector('#startButton');
       const video = document.querySelector('#birthdayVideo');
-      const sceneEl = document.querySelector('a-scene');
 
       startButton.addEventListener('click', () => {
-        // Start AR and Video together
-        const arSystem = sceneEl.systems["mindar-image-system"];
-        arSystem.start(); 
-        video.play();
-        
-        startButton.style.display = 'none';
-      });
-
-      // Extra check to kill the VR button if it tries to spawn late
-      sceneEl.addEventListener('renderstart', () => {
-        const vrBtn = document.querySelector('.a-enter-vr');
-        if(vrBtn) vrBtn.style.display = 'none';
+        // Just play the video. The AR system is already running in the background.
+        video.play().then(() => {
+            console.log("Video playing successfully");
+            startButton.style.display = 'none';
+        }).catch((err) => {
+            console.error("Video play failed:", err);
+            // Fallback: try to play muted if it fails
+            video.muted = true;
+            video.play();
+            startButton.style.display = 'none';
+        });
       });
     </script>
   </body>
