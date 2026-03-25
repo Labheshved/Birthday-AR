@@ -2,15 +2,20 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mind-ar-image-aframe.prod.js"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/mind-ar-image-aframe.prod.js"></script>
+    
     <style>
       body { margin: 0; overflow: hidden; background: #000; }
-      .a-enter-vr, .a-enter-ar { display: none !important; }
+      /* Nuclear option to hide A-Frame UI */
+      .a-enter-vr, .a-enter-ar, .a-loader-title, .a-ui { display: none !important; visibility: hidden !important; }
+      
       #startButton {
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        z-index: 99999; padding: 20px 40px; background: #d4af37; color: white;
-        border: none; border-radius: 50px; font-family: serif; font-weight: bold; font-size: 1.2rem;
+        z-index: 10000; padding: 20px 40px; background: #d4af37; color: white;
+        border: none; border-radius: 50px; font-family: 'serif'; font-weight: bold; font-size: 1.2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
       }
     </style>
   </head>
@@ -18,9 +23,10 @@
     <button id="startButton">Tap for April 14th Surprise ❤️</button>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: no; uiScanning: no;" 
       vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: true">
+      device-orientation-permission-ui="enabled: true"
+      embedded>
       
       <a-assets>
         <video id="birthdayVideo" src="./birthday-memory-reel.mp4" 
@@ -40,24 +46,23 @@
       const video = document.querySelector('#birthdayVideo');
       const sceneEl = document.querySelector('a-scene');
 
+      // 1. Force a click handler that also handles Audio Context
       startButton.addEventListener('click', () => {
-        const arSystem = sceneEl.systems["mindar-image-system"];
-        
-        // Step 1: Attempt to start AR
-        try {
-          arSystem.start(); 
-          // Step 2: Attempt to play video
-          video.play();
-          // Step 3: Hide button
+        // Attempt to play video
+        video.play().then(() => {
+          console.log("Video playing");
           startButton.style.display = 'none';
-        } catch (err) {
-          alert("Error starting AR: " + err.message);
-        }
+        }).catch((err) => {
+          console.log("Auto-play blocked, muting...");
+          video.muted = true;
+          video.play();
+          startButton.style.display = 'none';
+        });
       });
 
-      // Catch specific MindAR loading errors
+      // 2. Alert if there is a file loading error
       sceneEl.addEventListener("arError", (event) => {
-        alert("AR System Error: Check if 'targets.mind' exists and you are on HTTPS.");
+        alert("Camera or Target Error. Please check permissions and file paths.");
       });
     </script>
   </body>
